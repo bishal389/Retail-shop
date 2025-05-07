@@ -69,60 +69,61 @@ include('footer.php');
 
 
 <?php
-
-
 if (isset($_GET['place'])) {
-
 
     $c_id = $_SESSION['customer_id'];
 
-    $query = "select * from customer where customer_id= '$c_id'";
-
+    // Get customer data
+    $query = "SELECT * FROM customer WHERE customer_id = '$c_id'";
     $run_query = mysqli_query($con, $query);
-
+    if (!$run_query) {
+        die("Customer query failed: " . mysqli_error($con));
+    }
 
     $get_query = mysqli_fetch_array($run_query);
-
     $custom_id = $get_query['customer_id'];
 
-
-    $get_items = "select * from cart where c_id = '$c_id'";
-    $run_items = mysqli_query($db, $get_items);
+    // Get cart items
+    $get_items = "SELECT * FROM cart WHERE c_id = '$c_id'";
+    $run_items = mysqli_query($con, $get_items);
+    if (!$run_items) {
+        die("Cart query failed: " . mysqli_error($con));
+    }
 
     while ($row_items = mysqli_fetch_array($run_items)) {
         $p_id = $row_items['products_id'];
         $pro_qty = $row_items['qty'];
 
-        $get_item = "select * from products where products_id = '$p_id'";
-        $run_item = mysqli_query($db, $get_item);
-
-        while ($row_item = mysqli_fetch_array($run_item)) {
-
-            $pro_price = $row_item['product_price'];
-
-            $total_q += $pro_qty;
-            $pro_total_p = $pro_price * $pro_qty;
+        // Get product details
+        $get_item = "SELECT * FROM products WHERE products_id = '$p_id'";
+        $run_item = mysqli_query($con, $get_item);
+        if (!$run_item) {
+            die("Product query failed: " . mysqli_error($con));
         }
 
-        $final_price += $pro_total_p;
+        $row_item = mysqli_fetch_array($run_item);
+        $pro_price = $row_item['product_price'];
+
+        $pro_total_p = $pro_price * $pro_qty;
+
+        // Insert order
+        $order = "INSERT INTO orders (order_qty, order_price, c_id, product_id, date)
+                  VALUES ('$pro_qty', '$pro_total_p', '$custom_id', '$p_id', NOW())";
+
+        $run_order = mysqli_query($con, $order);
+        if (!$run_order) {
+            die("Order insert failed: " . mysqli_error($con));
+        }
     }
-    $order = "insert into orders (order_qty, order_price, c_id, date) values ('$total_q','$final_price','$custom_id',NOW())";
 
-    $run_order = mysqli_query($con, $order);
-
-
-    $cart_clear = "delete from cart where c_id = '$c_id'";
-
+    // Clear the cart
+    $cart_clear = "DELETE FROM cart WHERE c_id = '$c_id'";
     $run_clear = mysqli_query($con, $cart_clear);
+    if (!$run_clear) {
+        die("Cart clear failed: " . mysqli_error($con));
+    }
 
-    echo "<script>alert('Order Placed. Thankyou for Shopping')</script>";
+    echo "<script>alert('Order Placed. Thank you for Shopping')</script>";
     echo "<script>window.open('account.php?orders','_self')</script>";
 }
-
-
-
-
-
-
-
 ?>

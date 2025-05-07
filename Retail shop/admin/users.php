@@ -1,4 +1,10 @@
-<?php require_once 'include/header.php'?>
+<?php
+require_once 'include/header.php';
+if (!isset($_SESSION['admin_id'])) {
+  echo "<script>window.open('login.php','_self');</script>";
+  exit();
+}
+?>
 <?php 
    require_once '../db.php';
    if(isset($_GET['delete_id'])){

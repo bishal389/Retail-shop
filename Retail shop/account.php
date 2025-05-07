@@ -1,8 +1,13 @@
 <?php
-$active = "Account";
-include("db.php");
-include("functions.php");
-include("header.php");
+    $active = "Account";
+    include("db.php");
+    include("functions.php");
+    include("header.php");
+    if (!isset($_SESSION['customer_id'])) {
+        echo "<script>alert('Please log in to access your account.');</script>";
+        echo "<script>window.open('login.php','_self');</script>";
+        exit();
+    }
 ?>
 
 <!-- Breadcrumb Section Begin -->

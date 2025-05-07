@@ -2,7 +2,8 @@
 
 <?php
 if (!isset($_SESSION['admin_id'])) {
-   echo "<script>window.location.href = 'login.php'</script>";
+    echo "<script>window.open('login.php','_self');</script>";
+    exit();
 }
 
 require_once '../db.php';

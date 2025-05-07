@@ -17,7 +17,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     exit;
 }
 ?>
-<?php require_once 'include/header.php'; ?>
+<?php
+require_once 'include/header.php';
+if (!isset($_SESSION['admin_id'])) {
+  echo "<script>window.open('login.php','_self');</script>";
+  exit();
+}
+?>
 <?php
     if (isset($_GET['delete_id'])) {
         $query1 = "DELETE FROM orders WHERE order_id = " . $_GET['delete_id'];

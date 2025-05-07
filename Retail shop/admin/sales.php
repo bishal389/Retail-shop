@@ -1,5 +1,13 @@
-<?php require_once '../db.php'; ?>
-<?php require_once 'include/header.php'; ?>
+<?php
+require_once '../db.php';
+?>
+<?php
+require_once 'include/header.php';
+if (!isset($_SESSION['admin_id'])) {
+  echo "<script>window.open('login.php','_self');</script>";
+  exit();
+}
+?>
 <?php
     $query = "SELECT orders.order_id, orders.order_price, orders.order_qty, orders.date, orders.status,
                 customer.customer_email, products.product_title, products.product_img1

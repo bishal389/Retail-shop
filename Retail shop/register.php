@@ -77,14 +77,13 @@
         var con = $('#con').val();
         var password = $('#pass').val();
 
-        var letters = /^[A-Za-z]+$/;
+        var letters = /^[A-Za-z]+(?: [A-Za-z]+){0,2}$/;
         var em = /\S+@\S+\.\S+/;
         var numbers = /^[0-9]{11}$/;
         var strongPass = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
         if (!name.match(letters)) {
-            $("#nameerr").html(
-                "<span class='alert alert-danger'>Enter Valid Name (Letters only)</span>");
+            $("#nameerr").html("<span class='alert alert-danger'>Enter Valid Name (Letters only)</span>");
             event.preventDefault();
         }
 
@@ -156,7 +155,9 @@ if (isset($_POST['register'])) {
     $stmt->bind_param("sssssss", $c_name, $c_email, $c_pass, $c_address, $c_contact, $fileName, $c_ip);
 
     if ($stmt->execute()) {
+        $customer_id = $con->insert_id;
         $_SESSION['customer_email'] = $c_email;
+        $_SESSION['customer_id'] = $customer_id;
         $_SESSION['customer_name'] = $c_name;
         $_SESSION['customer_contact'] = $c_contact;
         $_SESSION['customer_address'] = $c_address;

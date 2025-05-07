@@ -2,9 +2,9 @@
 
 if (isset($_SESSION['customer_email'])) {
 
-    $c_id = $_SESSION['customer_email'];
+    $c_id = $_SESSION['customer_id'];
 
-    $query = "select * from customer where customer_email= '$c_id'";
+    $query = "select * from customer where customer_id= '$c_id'";
 
     $run_query = mysqli_query($con, $query);
 
