@@ -29,7 +29,7 @@ function addCart()
     if (isset($_GET['add_cart'])) {
         $ip_add = getRealIpUser();
 
-        $c_id = $_SESSION['customer_id'];
+        $c_id = $_SESSION['customer_id'] ?? null;
         $p_id = $_GET['add_cart'];
         $qty = $_POST['product_qty'];
         $size = $_POST['size'];
@@ -467,7 +467,7 @@ function items()
     global $db;
 
     $ip_add = getRealIpUser();
-    $c_id = $_SESSION['customer_id'];
+    $c_id = $_SESSION['customer_id'] ?? null;
 
     $get_items = "select * from cart where c_id = '$c_id'";
     $run_items = mysqli_query($db, $get_items);
@@ -484,7 +484,7 @@ function total_price()
     global $db;
 
     $ip_add = getRealIpUser();
-    $c_id = $_SESSION['customer_id'];
+    $c_id = $_SESSION['customer_id'] ?? null;
     
 
     $total = 0;
@@ -516,7 +516,7 @@ function cart_items()
 
     global $db;
 
-    $c_id = $_SESSION['customer_id'];
+    $c_id = $_SESSION['customer_id'] ?? null;
 
     $get_items = "select * from cart where c_id = '$c_id' ORDER BY date DESC";
     $run_itemss = mysqli_query($db, $get_items);
@@ -596,7 +596,7 @@ function cart_icon_prod()
 
     global $db;
 
-    $c_id = $_SESSION['customer_id'];
+    $c_id = $_SESSION['customer_id'] ?? null;
     $ip_add = getRealIpUser();
 
 
@@ -657,7 +657,7 @@ function checkoutProds()
     global $db;
 
     $ip_add = getRealIpUser();
-    $c_id = $_SESSION['customer_id'];
+    $c_id = $_SESSION['customer_id'] ?? null;
 
 
 

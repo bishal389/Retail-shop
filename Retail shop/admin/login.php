@@ -1,4 +1,9 @@
-<?php session_start()?>
+<?php session_start();
+if (isset($_SESSION['admin_id'])) {
+    echo "<script>window.open('index.php','_self');</script>";
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
     <head>

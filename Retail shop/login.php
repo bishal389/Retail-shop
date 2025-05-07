@@ -3,6 +3,10 @@ $active = "Login";
 include("db.php");
 include("functions.php");
 include("header.php");
+if (isset($_SESSION['customer_id'])) {
+    echo "<script>window.open('account.php','_self');</script>";
+    exit();
+}
 ?>
 
 

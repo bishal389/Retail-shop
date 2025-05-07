@@ -72,6 +72,10 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                                 Users
                             </a>
+                            <a class="nav-link" href="admin_blog.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-blog"></i></div>
+                                Blog Management
+                            </a>
                         </div>
                     </div>
                     <div class="sb-sidenav-footer">

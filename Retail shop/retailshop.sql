@@ -25,12 +25,32 @@ CREATE TABLE IF NOT EXISTS `admin` (
   `admin_name` varchar(50) DEFAULT NULL,
   `admin_email` varchar(255) DEFAULT NULL,
   `password` longtext DEFAULT NULL,
+  `role` varchar(50) DEFAULT 'admin',
   PRIMARY KEY (`admin_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table retail_shop.admin: ~1 rows (approximately)
-INSERT INTO `admin` (`admin_id`, `admin_name`, `admin_email`, `password`) VALUES
-	(1, 'Super Admin', 'admin@gmail.com', '$2y$12$7Ptn.0/alRdnriiJnFA5I.A/bf0OowY.Dy1c38df45yyt6c/oZs4i');
+INSERT INTO `admin` (`admin_id`, `admin_name`, `admin_email`, `password`, `role`) VALUES
+	(1, 'Super Admin', 'admin@gmail.com', '$2y$12$7Ptn.0/alRdnriiJnFA5I.A/bf0OowY.Dy1c38df45yyt6c/oZs4i', 'admin');
+
+-- Dumping structure for table retail_shop.blog_posts
+CREATE TABLE IF NOT EXISTS `blog_posts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `category_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_category` (`category_id`),
+  CONSTRAINT `fk_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Dumping data for table retail_shop.blog_posts: ~3 rows (approximately)
+INSERT INTO `blog_posts` (`id`, `title`, `content`, `image`, `created_at`, `category_id`) VALUES
+	(1, 'Leandra Medine On The Importance Of Maintaining Her Personal Style', 'The founder of Man Repeller is already thinking about outfitting you for New Year\'s Eve 2020...', 'img/blog/blog1.jpg', '2025-05-06 11:59:21', 1),
+	(2, 'Olivia Anthony Thinks There Absolutely Should Be Crying In Fashion', 'Introducing Self-Made, Refinery29\'s newest column spotlighting the real stories...', 'img/blog/blog2.jpg', '2025-05-06 11:59:21', 1),
+	(3, 'My Blog', 'Lorem Lupsum', 'https://cdn.pixabay.com/photo/2014/06/03/19/38/board-361516_640.jpg', '2025-05-06 12:23:12', 1);
 
 -- Dumping structure for table retail_shop.cart
 CREATE TABLE IF NOT EXISTS `cart` (
@@ -91,8 +111,8 @@ CREATE TABLE IF NOT EXISTS `orders` (
 
 -- Dumping data for table retail_shop.orders: ~2 rows (approximately)
 INSERT INTO `orders` (`order_id`, `order_qty`, `order_price`, `c_id`, `product_id`, `date`, `status`) VALUES
-	(1, 1, '1000', 2, 6, '2025-05-05 16:43:27', 'Processing'),
-	(2, 1, '30', 1, 4, '2025-05-05 16:47:31', 'Processing');
+	(1, 1, '1000', 2, 6, '2025-05-06 06:26:01', 'Sold'),
+	(2, 1, '30', 1, 4, '2025-05-06 06:25:58', 'Sold');
 
 -- Dumping structure for table retail_shop.products
 CREATE TABLE IF NOT EXISTS `products` (
