@@ -1,6 +1,6 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               11.4.5-MariaDB - mariadb.org binary distribution
+-- Server version:               11.4.6-MariaDB - mariadb.org binary distribution
 -- Server OS:                    Win64
 -- HeidiSQL Version:             12.10.0.7000
 -- --------------------------------------------------------
@@ -27,11 +27,12 @@ CREATE TABLE IF NOT EXISTS `admin` (
   `password` longtext DEFAULT NULL,
   `role` varchar(50) DEFAULT 'admin',
   PRIMARY KEY (`admin_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table retail_shop.admin: ~1 rows (approximately)
+-- Dumping data for table retail_shop.admin: ~2 rows (approximately)
 INSERT INTO `admin` (`admin_id`, `admin_name`, `admin_email`, `password`, `role`) VALUES
-	(1, 'Super Admin', 'admin@gmail.com', '$2y$12$7Ptn.0/alRdnriiJnFA5I.A/bf0OowY.Dy1c38df45yyt6c/oZs4i', 'admin');
+	(1, 'Admin', 'admin@gmail.com', '$2y$12$kIfYygGWTnC7jgTnFSiSWOlGadrmIN/V6nJVYZIoUMSJ1An8Xnz7.', 'admin'),
+	(2, 'Super Admin', 'superadmin@gmail.com', '$2y$12$kIfYygGWTnC7jgTnFSiSWOlGadrmIN/V6nJVYZIoUMSJ1An8Xnz7.', 'superadmin');
 
 -- Dumping structure for table retail_shop.blog_posts
 CREATE TABLE IF NOT EXISTS `blog_posts` (
@@ -65,6 +66,19 @@ CREATE TABLE IF NOT EXISTS `cart` (
 
 -- Dumping data for table retail_shop.cart: ~0 rows (approximately)
 
+-- Dumping structure for table retail_shop.categories
+CREATE TABLE IF NOT EXISTS `categories` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Dumping data for table retail_shop.categories: ~3 rows (approximately)
+INSERT INTO `categories` (`id`, `name`) VALUES
+	(1, 'Fashion'),
+	(2, 'Lifestyle'),
+	(3, 'Trends');
+
 -- Dumping structure for table retail_shop.category
 CREATE TABLE IF NOT EXISTS `category` (
   `cat_id` int(10) NOT NULL AUTO_INCREMENT,
@@ -89,13 +103,14 @@ CREATE TABLE IF NOT EXISTS `customer` (
   `customer_contact` text NOT NULL,
   `customer_image` text NOT NULL,
   `customer_ip` varchar(45) NOT NULL,
+  `email_verified` tinyint(1) DEFAULT 0,
+  `verify_token` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`customer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table retail_shop.customer: ~2 rows (approximately)
-INSERT INTO `customer` (`customer_id`, `customer_name`, `customer_email`, `customer_pass`, `customer_address`, `customer_contact`, `customer_image`, `customer_ip`) VALUES
-	(1, 'John Doe', 'john@gmail.com', '$2y$12$XBwl1ONn3FeaQU1Qnk9JfubvbIpjUtp4dcZQyALe9M4PoraxK5v26', 'India', '98123453123', 'demo_photo.jpg', '::1'),
-	(2, 'Dhiraj', 'dh@gmail.com', '$2y$12$M9bYfnjQGKXMtpYOsh/d.O0CnEaSxW9TohrPGIFexg7CpOdnuou0K', 'Nepal', '91234574321', 'demo_photo.jpg', '::1');
+-- Dumping data for table retail_shop.customer: ~1 rows (approximately)
+INSERT INTO `customer` (`customer_id`, `customer_name`, `customer_email`, `customer_pass`, `customer_address`, `customer_contact`, `customer_image`, `customer_ip`, `email_verified`, `verify_token`) VALUES
+	(1, 'Dhiraj', 'dhiraj@gmail.com', '$2y$12$kIfYygGWTnC7jgTnFSiSWOlGadrmIN/V6nJVYZIoUMSJ1An8Xnz7.', 'Nepal', '98412345712', 'demo_photo.jpg', '::1', 1, NULL);
 
 -- Dumping structure for table retail_shop.orders
 CREATE TABLE IF NOT EXISTS `orders` (
@@ -107,12 +122,9 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `status` varchar(255) NOT NULL DEFAULT 'Processing',
   PRIMARY KEY (`order_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table retail_shop.orders: ~2 rows (approximately)
-INSERT INTO `orders` (`order_id`, `order_qty`, `order_price`, `c_id`, `product_id`, `date`, `status`) VALUES
-	(1, 1, '1000', 2, 6, '2025-05-06 06:26:01', 'Sold'),
-	(2, 1, '30', 1, 4, '2025-05-06 06:25:58', 'Sold');
+-- Dumping data for table retail_shop.orders: ~0 rows (approximately)
 
 -- Dumping structure for table retail_shop.products
 CREATE TABLE IF NOT EXISTS `products` (

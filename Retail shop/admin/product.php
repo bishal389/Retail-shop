@@ -7,14 +7,17 @@ if (!isset($_SESSION['admin_id'])) {
 ?>
 <?php 
    require_once '../db.php';
-   if(isset($_GET['delete_id'])){
-       $query1 = "DELETE FROM products WHERE products_id=".$_GET['delete_id'];
-
-       $result1 = mysqli_query($con, $query1);
-       if($result1){
-           $_SESSION['success'] = "The data has been deleted successfully";
-       }
-   }
+    if (isset($_GET['delete_id'])) {
+        if (isset($_SESSION['admin_role']) && $_SESSION['admin_role'] === 'superadmin') {
+            $query1 = "DELETE FROM products WHERE products_id=" . $_GET['delete_id'];
+            $result1 = mysqli_query($con, $query1);
+            if ($result1) {
+                $_SESSION['success'] = "The data has been deleted successfully";
+            }
+        } else {
+            $_SESSION['error'] = "You do not have permission to delete products.";
+        }
+    }
 
    $query = "SELECT * FROM `products` WHERE `product_status` != 'Sold'";
    $result = mysqli_query($con, $query);
@@ -28,6 +31,11 @@ if (!isset($_SESSION['admin_id'])) {
                 <?php echo $_SESSION['success']; unset($_SESSION['success']);?>
             </div>
         <?php endif?>
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert alert-danger">
+                <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+            </div>
+        <?php endif ?>
         <div class="card mb-4">
             <div class="card-header">
                 <div style="float: right;">
@@ -82,7 +90,11 @@ if (!isset($_SESSION['admin_id'])) {
                         <td><img src="../img/products/<?php echo $data['product_img1']?>" alt="" height="50"></td>
                         <td>
                             <a href="edit.php?id=<?php echo $data['products_id']; ?>)" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></a>
-                            <a href="javascript:delete_id(<?php echo $data['products_id']; ?>)" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
+                            <?php if (isset($_SESSION['admin_role']) && $_SESSION['admin_role'] === 'superadmin'): ?>
+                                <a href="javascript:delete_id(<?php echo $data['products_id']; ?>)" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            <?php endif; ?>
                         </td>
                      </tr>
                      <?php endforeach?>

@@ -65,7 +65,7 @@ require_once '../../db.php';
         $password = $_POST['password'];
     
         // Prepare SQL statement
-        $stmt = $con->prepare("SELECT admin_id, admin_name, admin_email, password FROM admin WHERE admin_email = ?");
+        $stmt = $con->prepare("SELECT * FROM admin WHERE admin_email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
     
@@ -77,6 +77,7 @@ require_once '../../db.php';
             if (password_verify($password, $data['password'])) {
                 $_SESSION['admin_id'] = $data['admin_id'];
                 $_SESSION['admin_email'] = $data['admin_email'];
+                $_SESSION['admin_role'] = $data['role'];
                 $_SESSION['admin_name'] = $data['admin_name'];
                 header('Location: ../index.php');
                 exit;

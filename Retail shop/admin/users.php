@@ -7,13 +7,16 @@ if (!isset($_SESSION['admin_id'])) {
 ?>
 <?php 
    require_once '../db.php';
-   if(isset($_GET['delete_id'])){
-       $query1 = "DELETE FROM customer WHERE customer_id=".$_GET['delete_id'];
-
-       $result1 = mysqli_query($con, $query1);
-       if($result1){
-           $_SESSION['success'] = "The data has been deleted successfully";
-       }
+   if (isset($_GET['delete_id'])) {
+      if (isset($_SESSION['admin_role']) && $_SESSION['admin_role'] === 'superadmin') {
+         $query1 = "DELETE FROM customer WHERE customer_id=" . $_GET['delete_id'];
+         $result1 = mysqli_query($con, $query1);
+         if ($result1) {
+               $_SESSION['success'] = "The data has been deleted successfully";
+         }
+      } else {
+         $_SESSION['error'] = "You do not have permission to delete users.";
+      }
    }
 
    $query = "SELECT * FROM `customer`";
@@ -23,11 +26,16 @@ if (!isset($_SESSION['admin_id'])) {
    <main>
       <div class="container-fluid px-4">
       <h1 class="mt-4">Users Table</h1>
-        <?php if(isset($_SESSION['success'])):?>
+         <?php if(isset($_SESSION['success'])):?>
             <div class="alert alert-success">
                 <?php echo $_SESSION['success']; unset($_SESSION['success']);?>
             </div>
-        <?php endif?>
+         <?php endif?>
+         <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert alert-danger">
+               <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+            </div>
+         <?php endif ?>
         <div class="card mb-4">
             <div class="card-header">
                <i class="fas fa-table me-1"></i>
@@ -43,7 +51,9 @@ if (!isset($_SESSION['admin_id'])) {
                         <th>Email</th>
                         <th>Address</th>
                         <th>Contact</th>
-                        <th>Action</th>
+                        <?php if (isset($_SESSION['admin_role']) && $_SESSION['admin_role'] === 'superadmin'): ?>
+                           <th>Action</th>
+                        <?php endif; ?>
                      </tr>
                   </thead>
                   <tbody>
@@ -54,9 +64,13 @@ if (!isset($_SESSION['admin_id'])) {
                         <td><?php echo $data['customer_email']?></td>
                         <td><?php echo $data['customer_address']?></td>
                         <td><?php echo $data['customer_contact']?></td>
-                        <td>
-                           <a href="javascript:delete_id(<?php echo $data['customer_id']; ?>)" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
-                        </td>
+                        <?php if (isset($_SESSION['admin_role']) && $_SESSION['admin_role'] === 'superadmin'): ?>
+                           <td>
+                              <a href="javascript:delete_id(<?php echo $data['customer_id']; ?>)" class="btn btn-danger btn-sm">
+                                 <i class="fas fa-trash"></i>
+                              </a>
+                           </td>
+                        <?php endif; ?>
                      </tr>
                      <?php endforeach?>
                   </tbody>

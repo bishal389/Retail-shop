@@ -26,13 +26,24 @@ if (!isset($_SESSION['admin_id'])) {
 ?>
 <?php
     if (isset($_GET['delete_id'])) {
-        $query1 = "DELETE FROM orders WHERE order_id = " . $_GET['delete_id'];
-        $result1 = mysqli_query($con, $query1);
-        if ($result1) {
-            $_SESSION['success'] = "The order has been deleted successfully";
+        // Ensure role is set and is superadmin
+        if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'superadmin') {
+            $_SESSION['error'] = "Only superadmins can delete orders.";
             header("Location: orders.php");
             exit;
         }
+
+        $delete_id = intval($_GET['delete_id']); // Sanitize input
+        $stmt = $con->prepare("DELETE FROM orders WHERE order_id = ?");
+        $stmt->bind_param("i", $delete_id);
+        
+        if ($stmt->execute()) {
+            $_SESSION['success'] = "The order has been deleted successfully";
+        } else {
+            $_SESSION['error'] = "Failed to delete the order.";
+        }
+        header("Location: orders.php");
+        exit;
     }
 
     $query = "SELECT orders.order_id, orders.order_price, orders.order_qty, orders.date, orders.status,
@@ -79,6 +90,12 @@ if (!isset($_SESSION['admin_id'])) {
       <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success">
           <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+        </div>
+      <?php endif ?>
+
+      <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger">
+          <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
         </div>
       <?php endif ?>
 
@@ -132,9 +149,11 @@ if (!isset($_SESSION['admin_id'])) {
                       onclick="openEditModal(<?php echo $order['order_id']; ?>, '<?php echo $order['status']; ?>')">
                       <i class="fas fa-edit"></i>
                     </button>
-                    <a href="javascript:delete_id(<?php echo $order['order_id']; ?>)" class="btn btn-danger btn-sm">
-                      <i class="fas fa-trash"></i>
-                    </a>
+                    <?php if (isset($_SESSION['admin_role']) && $_SESSION['admin_role'] === 'superadmin'): ?>
+                      <a href="javascript:delete_id(<?php echo $order['order_id']; ?>)" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    <?php endif; ?>
                   </td>
                 </tr>
               <?php endforeach ?>

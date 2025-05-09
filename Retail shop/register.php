@@ -112,6 +112,36 @@
 <?php
 if (isset($_POST['register'])) {
     require_once("db.php");
+    include('smtp/PHPMailerAutoload.php');
+
+    function smtp_mailer($to, $subject, $msg) {
+        $mail = new PHPMailer(); 
+        $mail->IsSMTP(); 
+        $mail->SMTPAuth = true; 
+        $mail->SMTPSecure = 'tls'; 
+        $mail->Host = "smtp.gmail.com";
+        $mail->Port = 587; 
+        $mail->IsHTML(true);
+        $mail->CharSet = 'UTF-8';
+        $mail->Username = "shopretail297@gmail.com";
+        $mail->Password = "gjuc vncr bmrb gbyf";
+        $mail->SetFrom("shopretail297@gmail.com");
+        $mail->Subject = $subject;
+        $mail->Body = $msg;
+        $mail->AddAddress($to);
+        $mail->SMTPOptions = array('ssl' => array(
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+            'allow_self_signed' => true
+        ));
+
+        if (!$mail->Send()) {
+            error_log("Mailer Error: " . $mail->ErrorInfo);
+            return false;
+        } else {
+            return true;
+        }
+    }
 
     $c_name    = trim($_POST['name']);
     $c_email   = trim($_POST['cemail']);
@@ -120,6 +150,19 @@ if (isset($_POST['register'])) {
     $c_pass_raw = $_POST['password'];
     $c_ip = getRealIpUser();
 
+    // Check if email already exists
+    $check_email = $con->prepare("SELECT customer_email FROM customer WHERE customer_email = ?");
+    $check_email->bind_param("s", $c_email);
+    $check_email->execute();
+    $check_email->store_result();
+
+    if ($check_email->num_rows > 0) {
+        echo "<script>alert('Email is already registered. Please use another email.'); window.location.href='register.php';</script>";
+        exit();
+    }
+    $check_email->close();
+
+    // Validate password
     if (!preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/", $c_pass_raw)) {
         echo "<script>alert('Password must be at least 8 characters and include uppercase, lowercase, number, and special character.')</script>";
         exit();
@@ -127,6 +170,7 @@ if (isset($_POST['register'])) {
 
     $c_pass = password_hash($c_pass_raw, PASSWORD_DEFAULT);
 
+    // Image upload
     $tardir = "img/customer/";
     $fileName = basename($_FILES['pimage']['name']);
     $targetPath = $tardir . $fileName;
@@ -143,8 +187,11 @@ if (isset($_POST['register'])) {
         exit();
     }
 
-    $stmt = $con->prepare("INSERT INTO customer (customer_name, customer_email, customer_pass, customer_address, customer_contact, customer_image, customer_ip)
-                           VALUES (?, ?, ?, ?, ?, ?, ?)");
+    // Generate email verification token
+    $verify_token = md5(rand());
+
+    $stmt = $con->prepare("INSERT INTO customer (customer_name, customer_email, customer_pass, customer_address, customer_contact, customer_image, customer_ip, verify_token)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
     if (!$stmt) {
         error_log("Prepare failed: " . $con->error);
@@ -152,33 +199,22 @@ if (isset($_POST['register'])) {
         exit();
     }
 
-    $stmt->bind_param("sssssss", $c_name, $c_email, $c_pass, $c_address, $c_contact, $fileName, $c_ip);
+    $stmt->bind_param("ssssssss", $c_name, $c_email, $c_pass, $c_address, $c_contact, $fileName, $c_ip, $verify_token);
 
     if ($stmt->execute()) {
-        $customer_id = $con->insert_id;
-        $_SESSION['customer_email'] = $c_email;
-        $_SESSION['customer_id'] = $customer_id;
-        $_SESSION['customer_name'] = $c_name;
-        $_SESSION['customer_contact'] = $c_contact;
-        $_SESSION['customer_address'] = $c_address;
-        $_SESSION['customer_image'] = $fileName;
+        $verify_link = "http://localhost:8000/verify.php?token=$verify_token";
+        $subject = "Verify Your Email Address";
+        $message = "
+            <h3>Welcome, $c_name!</h3>
+            <p>Please verify your email by clicking the link below:</p>
+            <a href='$verify_link'>Verify Email</a>
+        ";
 
-        $stmt_cart = $con->prepare("SELECT * FROM cart WHERE c_id = ?");
-        $stmt_cart->bind_param("s", $c_email);
-        $stmt_cart->execute();
-        $result_cart = $stmt_cart->get_result();
-        $check_cart = $result_cart->num_rows;
+        smtp_mailer($c_email, $subject, $message);
 
-        echo "<script>alert('Account registered successfully. You are now logged in.');</script>";
-
-        if ($check_cart > 0) {
-            echo "<script>window.open('check-out.php','_self')</script>";
-        } else {
-            echo "<script>window.open('index.php','_self')</script>";
-        }
+        echo "<script>alert('Registered successfully! Please check your email to verify your account.'); window.location.href='login.php';</script>";
     } else {
-        error_log("Execute failed: " . $stmt->error);
-        echo "<script>alert('Failed to register user. Please try again later.')</script>";
+        echo "<script>alert('Registration failed. Try again later.');</script>";
     }
 
     $stmt->close();
