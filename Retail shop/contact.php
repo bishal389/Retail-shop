@@ -67,7 +67,7 @@ include("header.php");
                     <div class="leave-comment">
                         <h4>Leave A Message</h4>
                         <p>Our staff will call back later and answer your questions.</p>
-                        <form action="contact.php" class="comment-form">
+                        <form action="contact.php" method="POST" class="comment-form">
                             <div class="row">
                                 <div class="col-lg-6">
                                     <input type="text" placeholder="Your name" class="form-control" name="name" required>
@@ -80,24 +80,27 @@ include("header.php");
                                 </div>
                                 <div class="col-lg-12">
                                     <textarea placeholder="Your message" class="form-control" name="message"></textarea>
-                                    <button class="site-btn" name="submit">Send message</button>
+                                    <button type="submit" class="site-btn" name="contact_submit">Send message</button>
                                 </div>
                             </div>
                         </form>
 
                         <?php
+                            if (isset($_POST['contact_submit'])) {
+                                $user_name = mysqli_real_escape_string($con, $_POST['name']);
+                                $user_email = mysqli_real_escape_string($con, $_POST['email']);
+                                $user_subject = mysqli_real_escape_string($con, $_POST['subject']);
+                                $user_msg = mysqli_real_escape_string($con, $_POST['message']);
 
-                        if (isset($_POST['submit'])) {
-                            $user_name = $_POST['name'];
-                            $user_email = $_POST['email'];
-                            $user_subject = $_POST['subject'];
-                            $user_msg = $_POST['message'];
-
-                            $receiver_mail = 'yousafsaddique523@gmail.com';
-
-                            mail($receiver_mail, $user_name, $user_subject, $user_msg, $user_email);
-                        }
-
+                                $insert = "INSERT INTO contact_messages (name, email, subject, message) 
+                                        VALUES ('$user_name', '$user_email', '$user_subject', '$user_msg')";
+                                
+                                if (mysqli_query($con, $insert)) {
+                                    echo "<script>alert('Message sent successfully!');</script>";
+                                } else {
+                                    echo "<script>alert('Message sending failed. Please try again.');</script>";
+                                }
+                            }
                         ?>
                     </div>
                 </div>

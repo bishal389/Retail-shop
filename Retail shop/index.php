@@ -77,7 +77,7 @@ include("header.php");
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-4">
-                <a href='shop.php?cat_id=2'>
+                <a href='shop.php?p_cat_id=2'>
                     <div class="single-banner">
                         <img src="img/banner-1.png" alt="">
                         <div class="inner-text">
@@ -88,7 +88,7 @@ include("header.php");
 
             </div>
             <div class="col-lg-4">
-                <a href='shop.php?cat_id=2'>
+                <a href='shop.php?p_cat_id=5'>
                     <div class="single-banner">
                         <img src="img/banner-2.png" alt="">
                         <div class="inner-text">
@@ -99,7 +99,7 @@ include("header.php");
 
             </div>
             <div class="col-lg-4">
-                <a href='shop.php?cat_id=3'>
+                <a href='shop.php?p_cat_id=6'>
                     <div class="single-banner">
                         <img src="img/banner-3.png" alt="">
                         <div class="inner-text">
@@ -118,7 +118,7 @@ include("header.php");
             <div class="col-lg-3">
                 <div class="product-large set-bg" data-setbg="img/men-large.jpeg">
                     <h2>Men’s</h2>
-                    <a href="shop.php?cat_id=4">Discover More</a>
+                    <a href="shop.php?p_cat_id=3">Discover More</a>
                 </div>
             </div>
             <div class="col-lg-8 offset-lg-1">
@@ -144,7 +144,7 @@ include("header.php");
             <div class="col-lg-3">
                 <div class="product-large set-bg" data-setbg="img/women-large.jpg">
                     <h2>Women’s</h2>
-                    <a href="shop.php?cat_id=2">Discover More</a>
+                    <a href="shop.php?p_cat_id=5">Discover More</a>
                 </div>
             </div>
             <div class="col-lg-8 offset-lg-1">
@@ -177,6 +177,36 @@ if (isset($_GET['stat'])) {
         </script>";
 }
 ?>
+
+<script>
+    function showSuggestions(query) {
+        const suggestionsBox = document.getElementById("searchSuggestions");
+
+        if (query.length == 0) {
+            suggestionsBox.innerHTML = "";
+            suggestionsBox.classList.remove("show");
+            return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "search_suggestions.php?query=" + encodeURIComponent(query), true);
+        xhr.onreadystatechange = function () {
+            // Check if request is complete
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                const trimmedResponse = xhr.responseText.trim();
+
+                if (trimmedResponse != "") {
+                    suggestionsBox.innerHTML = trimmedResponse;
+                    suggestionsBox.classList.add("show");
+                } else {
+                    suggestionsBox.innerHTML = "<div class='dropdown-item'>No products found</div>";
+                    suggestionsBox.classList.add("show");
+                }
+            }
+        };
+        xhr.send();
+    }
+</script>
 
 </body>
 

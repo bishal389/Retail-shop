@@ -99,6 +99,6 @@ $categories = mysqli_query($con, "SELECT * FROM categories");
             </div>
         </div>
     </main>
+    
+    <?php require_once 'include/footer.php'; ?>
 </div>
-
-<?php require_once 'include/footer.php'; ?>

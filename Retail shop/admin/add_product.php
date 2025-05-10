@@ -17,60 +17,38 @@
                             <input type="text" class="form-control" name="product_title" placeholder="Enter product name" required>
                         </div>
                         <div class="form-group">
-                            <label for="exampleInputEmail1">Product Category</label>
-                                <select class="form-control" name="p_cat_id">
-
-                                    <option>Select a Product Category</option>
-
-                                    <?php
-
-                                    $get_p_category = "select * from product_categories";
-                                    $run_p_category = mysqli_query($con, $get_p_category);
-
-                                    while ($p_cat_row = mysqli_fetch_array($run_p_category)) {
-
-                                        $p_cat_id = $p_cat_row['p_cat_id'];
-                                        $p_cat_title = $p_cat_row['p_cat_title'];
-
-                                        echo "
-                                        
-                                        <option value='$p_cat_id'>$p_cat_title</option>  
-                                        
-                                    
-                                        ";
-                                    }
-
-                                    ?>
-
-                                </select>
+                            <label for="product_category">Product Category</label>
+                            <select class="form-control" name="cat_id" id="product_category" required>
+                                <option value="">Select a Product Category</option>
+                                <?php
+                                $get_p_category = "SELECT * FROM category GROUP BY cat_title";
+                                $run_p_category = mysqli_query($con, $get_p_category);
+                                while ($p_cat_row = mysqli_fetch_array($run_p_category)) {
+                                    $cat_id = $p_cat_row['cat_id'];
+                                    $cat_title = $p_cat_row['cat_title'];
+                                    echo "<option value='$cat_id' data-title='$cat_title'>$cat_title</option>";
+                                }
+                                ?>
+                            </select>
                         </div>
-                        <div class="form-group">
-                            <label for="exampleInputEmail1">Category</label>
-                                <select class="form-control" name="cat_id">
+                        <div class="form-group" id="genderSelect" style="display: none;">
+                            <label for="gender">Select Target Group</label>
+                            <select class="form-control" name="product_gender">
+                                <?php
+                                $get_types_query = "SELECT DISTINCT p_cat_id, p_cat_type FROM product_categories WHERE p_cat_type IS NOT NULL AND p_cat_type != ''";
+                                $run_types = mysqli_query($con, $get_types_query);
 
-                                    <option>Select a Category</option>
-
-                                    <?php
-
-                                    $get_category = "select * from category";
-                                    $run_category = mysqli_query($con, $get_category);
-
-                                    while ($cat_row = mysqli_fetch_array($run_category)) {
-
-                                        $cat_id = $cat_row['cat_id'];
-                                        $cat_title = $cat_row['cat_title'];
-
-                                        echo "
-                                        
-                                        <option value='$cat_id'>$cat_title</option>  
-                                        
-                                    
-                                        ";
+                                if ($run_types && mysqli_num_rows($run_types) > 0) {
+                                    while ($type_row = mysqli_fetch_assoc($run_types)) {
+                                        $id = htmlspecialchars($type_row['p_cat_id']);
+                                        $type = htmlspecialchars($type_row['p_cat_type']);
+                                        echo "<option value=\"$id\">$type</option>";
                                     }
-
-                                    ?>
-
-                                </select>
+                                } else {
+                                    echo "<option disabled>No options available</option>";
+                                }
+                                ?>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="exampleInputEmail1">Product Image # 1</label>
@@ -119,5 +97,20 @@
         btn.disabled = true;
         btn.value = 'Submitting...';
     }
+    document.addEventListener('DOMContentLoaded', function () {
+        const productCategory = document.getElementById('product_category');
+        const genderSelect = document.getElementById('genderSelect');
+
+        productCategory.addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex];
+            const selectedTitle = selectedOption.getAttribute('data-title');
+
+            if (selectedTitle.trim().toLowerCase() === 'clothes') {
+                genderSelect.style.display = 'block';
+            } else {
+                genderSelect.style.display = 'none';
+            }
+        });
+    });
    </script>
 <?php require_once 'include/footer.php'?>

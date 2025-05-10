@@ -4,44 +4,21 @@ require_once '../../db.php';
 
     if (isset($_POST['product_add'])) {
 
-        $p_cat_id = $_POST['p_cat_id'];
         $cat_id = $_POST['cat_id'];
-        $product_title = $_POST['product_title'];
+        $product_title = mysqli_real_escape_string($con, $_POST['product_title']);
         $product_img1 = $_FILES['product_img1']['name'];
         $product_img2 = $_FILES['product_img2']['name'];
         $product_price = $_POST['product_price'];
-        $product_keywords = $_POST['product_keywords'];
-        $product_desc = $_POST['product_desc'];
+        $product_keywords = mysqli_real_escape_string($con, $_POST['product_keywords']);
+        $product_desc = mysqli_real_escape_string($con, $_POST['product_desc']);
+        $product_gender = isset($_POST['product_gender']) ? $_POST['product_gender'] : null;
+        $product_status = $_POST['product_status'];
 
-
-        $temp_name1 = $_FILES['product_img1']['tmp_name'];
-        $temp_name2 = $_FILES['product_img2']['tmp_name'];
-
-        move_uploaded_file($temp_name1, "../../img/products/$product_img1");
-        move_uploaded_file($temp_name2, "../../img/products/$product_img2");
-
-        $insert_product = "Insert into products (p_cat_id,cat_id,date,product_title,product_img1,product_img2,product_price,product_keywords,product_desc)
-        values ('$p_cat_id','$cat_id',NOW(),'$product_title','$product_img1','$product_img2','$product_price','$product_keywords','$product_desc')";
-
-        $run_insert_product = mysqli_query($con, $insert_product);
-
-        if ($run_insert_product) {
-            $_SESSION['success'] = "Product added successfully";
-            header('location:../product.php');
+        if ($cat_id == 3 && $product_gender !== null) {
+            $p_cat_id = $product_gender;
+        } else {
+            $p_cat_id = $_POST['cat_id'];
         }
-    }
-
-    if (isset($_POST['product_add'])) {
-
-        $p_cat_id = $_POST['p_cat_id'];
-        $cat_id = $_POST['cat_id'];
-        $product_title = $_POST['product_title'];
-        $product_img1 = $_FILES['product_img1']['name'];
-        $product_img2 = $_FILES['product_img2']['name'];
-        $product_price = $_POST['product_price'];
-        $product_keywords = $_POST['product_keywords'];
-        $product_desc = $_POST['product_desc'];
-
 
         $temp_name1 = $_FILES['product_img1']['tmp_name'];
         $temp_name2 = $_FILES['product_img2']['tmp_name'];
@@ -49,14 +26,20 @@ require_once '../../db.php';
         move_uploaded_file($temp_name1, "../../img/products/$product_img1");
         move_uploaded_file($temp_name2, "../../img/products/$product_img2");
 
-        $insert_product = "Insert into products (p_cat_id,cat_id,date,product_title,product_img1,product_img2,product_price,product_keywords,product_desc)
-        values ('$p_cat_id','$cat_id',NOW(),'$product_title','$product_img1','$product_img2','$product_price','$product_keywords','$product_desc')";
+        $insert_product = "INSERT INTO products (
+            p_cat_id, cat_id, date, product_title, product_img1, product_img2,
+            product_price, product_keywords, product_desc,  product_status
+        ) VALUES (
+            '$p_cat_id', '$cat_id', NOW(), '$product_title', '$product_img1',
+            '$product_img2', '$product_price', '$product_keywords', '$product_desc', '$product_status'
+        )";
 
         $run_insert_product = mysqli_query($con, $insert_product);
 
         if ($run_insert_product) {
             $_SESSION['success'] = "Product added successfully";
             header('location:../product.php');
+            exit();
         }
     }
 
@@ -127,19 +110,31 @@ require_once '../../db.php';
 
         $p_cat_id = $_POST['p_cat_id'];
         $cat_id = $_POST['cat_id'];
-        $product_title = $_POST['product_title'];
+        $product_title = mysqli_real_escape_string($con, $_POST['product_title']);
         $product_price = $_POST['product_price'];
-        $product_keywords = $_POST['product_keywords'];
-        $product_desc = $_POST['product_desc'];
+        $product_keywords = mysqli_real_escape_string($con, $_POST['product_keywords']);
+        $product_desc = mysqli_real_escape_string($con, $_POST['product_desc']);
+        $product_status = $_POST['product_status']; // Get product status
         $id = $_POST['product_id'];
 
-        $update = "UPDATE products SET p_cat_id = '$p_cat_id',cat_id='$cat_id',product_title='$product_title',product_price='$product_price',product_desc='$product_desc',product_keywords='$product_keywords'
-                    WHERE products_id = '$id'";
+        // Ensure product_status is sanitized (if needed)
+        $product_status = mysqli_real_escape_string($con, $product_status);
+
+        $update = "UPDATE products SET 
+                    p_cat_id = '$p_cat_id', 
+                    cat_id = '$cat_id', 
+                    product_title = '$product_title', 
+                    product_price = '$product_price', 
+                    product_desc = '$product_desc', 
+                    product_keywords = '$product_keywords', 
+                    product_status = '$product_status'  -- Include product_status
+                WHERE products_id = '$id'";
+
         echo $update;
 
-        $run_insert_product = mysqli_query($con, $update);
+        $run_update_product = mysqli_query($con, $update);
 
-        if ($run_insert_product) {
+        if ($run_update_product) {
             $_SESSION['success'] = "Product updated successfully";
             header('location:../product.php');
         }

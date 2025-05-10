@@ -55,13 +55,11 @@ function addCart()
 }
 
 
-// Retrieve Women Products for index slider
-
 function getWProduct()
 {
     global $db;
 
-    $get_products = "select * from products where cat_id=2 order by RAND() LIMIT 7";
+    $get_products = "select * from products where p_cat_id=5 order by RAND() LIMIT 7";
     $run_products = mysqli_query($db, $get_products);
 
 
@@ -105,7 +103,7 @@ function getMProduct()
 {
     global $db;
 
-    $get_products = "select * from products where cat_id=3 order by RAND() LIMIT 7";
+    $get_products = "select * from products where p_cat_id=3 order by RAND() LIMIT 7";
     $run_products = mysqli_query($db, $get_products);
 
 
@@ -145,26 +143,18 @@ function getMProduct()
 
 function getProdCat()
 {
-
     global $db;
 
-    $get_p_cats = "select * from product_categories";
+    $get_p_cats = "SELECT MIN(p_cat_id) AS p_cat_id, p_cat_title FROM product_categories GROUP BY p_cat_title";
     $run_p_cats = mysqli_query($db, $get_p_cats);
 
-
-
     while ($row_p_cats = mysqli_fetch_array($run_p_cats)) {
-
         $p_cat_id = $row_p_cats['p_cat_id'];
         $p_cat_title = $row_p_cats['p_cat_title'];
 
+        $link_param = (strtolower($p_cat_title) == "clothes") ? "cat_id" : "p_cat_id";
 
-        echo "
-
-
-        <li><a href='shop.php?p_cat_id=$p_cat_id'>$p_cat_title</a></li>
-
-        ";
+        echo "<li><a href='shop.php?$link_param=$p_cat_id'>$p_cat_title</a></li>";
     }
 }
 
@@ -172,24 +162,20 @@ function getProdCat()
 
 function getCat()
 {
-
     global $db;
 
-    $get_cats = "select * from category";
+    $get_cats = "SELECT * FROM category";
     $run_cats = mysqli_query($db, $get_cats);
 
-
-
     while ($row_cats = mysqli_fetch_array($run_cats)) {
-
         $cat_id = $row_cats['cat_id'];
         $cat_title = $row_cats['cat_title'];
 
+        // Use cat_id for Clothes, otherwise p_cat_id
+        $link_param = (strtolower($cat_title) == "clothes") ? "cat_id" : "p_cat_id";
 
         echo "
-
-        <li class='hovclass'><a href='shop.php?cat_id=$cat_id'>$cat_title</a></li>
-
+        <li class='hovclass'><a href='shop.php?$link_param=$cat_id'>$cat_title</a></li>
         ";
     }
 }
@@ -269,67 +255,74 @@ function getcatProd()
 
     if (isset($_GET['cat_id'])) {
 
-        $cat_id = $_GET['cat_id'];
+        $cat_id = mysqli_real_escape_string($db, $_GET['cat_id']);
 
-        $get_cat = "select * from category where cat_id='$cat_id'";
+        $get_cat = "SELECT * FROM category WHERE cat_id='$cat_id'";
         $run_cat = mysqli_query($db, $get_cat);
 
-        $row_cat = mysqli_fetch_array($run_cat);
+        if (!$run_cat) {
+            echo "<div class='card' style='font-weight:bold; color:#fe4231'>
+                    <div class='card-body'>Error fetching category details. Please try again later.</div>
+                  </div>";
+            return;
+        }
 
-        $p_cat_title = $row_cat['cat_title'];
-        $p_cat_desc = $row_cat['cat_desc'];
+        if (mysqli_num_rows($run_cat) > 0) {
+            $row_cat = mysqli_fetch_array($run_cat);
+            $p_cat_title = $row_cat['cat_title'];
+            $p_cat_desc = $row_cat['cat_desc'];
+        } else {
+            echo "<div class='card' style='font-weight:bold; color:#fe4231'>
+                    <div class='card-body'>Category not found.</div>
+                  </div>";
+            return;
+        }
 
-        $get_products = "select * from products where cat_id='$cat_id'";
+        $get_products = "SELECT * FROM products WHERE cat_id='$cat_id'";
         $run_products = mysqli_query($db, $get_products);
+
+        if (!$run_products) {
+            echo "<div class='card' style='font-weight:bold; color:#fe4231'>
+                    <div class='card-body'>Error fetching products. Please try again later.</div>
+                  </div>";
+            return;
+        }
 
         $count = mysqli_num_rows($run_products);
 
-
-
-
-
         if ($count == 0) {
-
-            echo "
-                <div class='card' style='font-weight:bold; color:#fe4231'>
+            echo "<div class='card' style='font-weight:bold; color:#fe4231'>
                     <div class='card-body'>No Products Available</div>
-                </div>
-
-                    ";
+                  </div>";
         } else {
-
-
-
+            // Display the products
             while ($row_products = mysqli_fetch_array($run_products)) {
-
                 $products_id = $row_products['products_id'];
                 $product_title = $row_products['product_title'];
                 $product_price = $row_products['product_price'];
                 $product_img1 = $row_products['product_img1'];
 
                 echo "
-        
                 <div class='col-lg-4 col-sm-6'>
-                <div class='product-item'>
-                    <div class='pi-pic' style='max-height:350px'>
-                        <img src='img/products/$product_img1' alt='$product_title'>
-                        <ul>
-                            <li class='quick-view'><a href='product.php?product_id=$products_id' style='background:#fe4231;color:white'>View Details</a></li>
-                        </ul>
-                    </div>
-                    <div class='pi-text'>
-                        <div class='catagory-name'></div>
-                        <a href='product.php?product_id=$products_id'>
-                            <h5>$product_title</h5>
-                        </a>
-                        <div class='product-price'>
-                        $ $product_price                    
+                    <div class='product-item'>
+                        <div class='pi-pic' style='max-height:350px'>
+                            <img src='img/products/$product_img1' alt='$product_title'>
+                            <ul>
+                                <li class='quick-view'><a href='product.php?product_id=$products_id' style='background:#fe4231;color:white'>View Details</a></li>
+                            </ul>
+                        </div>
+                        <div class='pi-text'>
+                            <div class='catagory-name'></div>
+                            <a href='product.php?product_id=$products_id'>
+                                <h5>$product_title</h5>
+                            </a>
+                            <div class='product-price'>
+                                $ $product_price
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-    ";
+                ";
             }
         }
     }

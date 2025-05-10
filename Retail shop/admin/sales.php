@@ -67,5 +67,5 @@ if (!isset($_SESSION['admin_id'])) {
       </div>
     </div>
   </main>
+  <?php require_once 'include/footer.php' ?>
 </div>
-<?php require_once 'include/footer.php' ?>

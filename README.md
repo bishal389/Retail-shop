@@ -46,7 +46,23 @@ This project is a PHP and MySQL-based **Retail E-Commerce Website**, developed a
 - **Collaboration**: GitHub Projects, Basecamp, Google Meet
 
 ---
+## 👤 User Credentials
+Email: sonusah7982@gmail.com  
+Password: 1234Apple@#
 
+Email: bishal@gmail.com  
+Password: 1234Apple@#
+
+
+## 🛠️ Admin Credentials
+Email: admin@gmail.com  
+Password: 1234Apple@#
+
+## 🛡️ Superadmin Credentials
+Email: superadmin@gmail.com  
+Password: 1234Apple@#
+
+---
 
 ## 📄 License
 

@@ -93,7 +93,7 @@ include('db.php');
 
         <!-- Middle Bar -->
 
-        <div class="container">
+         <div class="container">
             <div class="inner-header">
                 <div class="row">
                     <div class="col-md-3 logo">
@@ -103,17 +103,17 @@ include('db.php');
                     </div>
 
                     <div class="col-md-6">
-                        <form method="post">
+                        <!-- Search form -->
+                        <form method="post" id="searchForm">
                             <div class="input-group">
-                                <input type="text" name="search" placeholder="Search our Store" required>
+                                <input type="text" name="search" id="searchInput" placeholder="Search our Store" required oninput="showSuggestions(this.value)">
                                 <button type="submit" name="submit"><i class="ti-search"></i></button>
                             </div>
                         </form>
+                        <div id="searchSuggestions" class="dropdown-menu" style="position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;"></div>
                     </div>
 
-                    <div class="col-md-3 text-right" style="visibility:      <?php if ($_SESSION['customer_email'] == 'unset') {
-                                                                                    echo "hidden";
-                                                                                } ?>">
+                    <div class="col-md-3 text-right" style="visibility: <?php if ($_SESSION['customer_email'] == 'unset') { echo "hidden";} ?>">
                         <ul class="nav-right">
                             <li class="cart-icon">
                                 <a href="shopping-cart.php">
@@ -198,34 +198,23 @@ include('db.php');
 
 
     if (isset($_POST['submit'])) {
-
         $item = $_POST["search"];
 
-        $get_product = "select * from products where product_title LIKE '%$item%' LIMIT 0,1";
-
+        $get_product = "SELECT * FROM products WHERE product_title LIKE '%$item%' LIMIT 0,1";
         $run_product = mysqli_query($con, $get_product);
-
         $count = mysqli_num_rows($run_product);
 
         if ($count > 0) {
-
             $row_product = mysqli_fetch_array($run_product);
-
             $products_id = $row_product['products_id'];
-
-
-
             echo "<script>window.open('product.php?product_id=$products_id','_self')</script>";
         } else {
-
-            echo "
-            <script>
+            echo "<script>
                     bootbox.alert({
                         message: 'No product found',
                         backdrop: true
                     });
-            </script>";
-
+                  </script>";
         }
     }
     ?>

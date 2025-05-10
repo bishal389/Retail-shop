@@ -93,7 +93,7 @@ if (isset($_POST['login'])) {
 
     $user = $result->fetch_assoc();
 
-    if ($user['verified'] != 1) {
+    if ($user['email_verified'] != 1) {
         echo "<script>
                 bootbox.alert({
                     message: 'Your email is not verified. Please check your inbox and verify your account.',

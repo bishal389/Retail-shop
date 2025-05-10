@@ -209,7 +209,6 @@ while ($row = mysqli_fetch_assoc($result_orders_by_status)) {
 
       </div>
    </main>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
